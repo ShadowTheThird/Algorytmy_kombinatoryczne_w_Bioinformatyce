@@ -51,6 +51,9 @@ void Check_coupling(vector<int> first, vector<int> second){
 
 Node Search_Node(int key){
     int id = key;
+    if(id >= graph.size()){
+        id = graph.size() - 1;
+    }
     for(int falesafe = 20; graph[id].key != key; --falesafe){
         if(graph[id].key < key){
             ++id;
@@ -62,7 +65,7 @@ Node Search_Node(int key){
             return Node(-1);
         }
     }
-    return graph[key];
+    return graph[id];
 }
 void Linearity_test(Node first){
     for(int i = 0; i < first.neighbours.size(); ++i){
@@ -74,7 +77,7 @@ void Linearity_test(Node first){
             if(first_node.key == -1 || second_node.key == -1){
                 continue;
             }
-            if(first_node.neighbours == second_node.neighbours){
+            if(first_node.neighbours == second_node.neighbours && !first_node.neighbours.empty()){
                 linear = false;
                 return;
             }
@@ -125,7 +128,7 @@ int main(){
             }
             if(!Type_test(graph[i], graph[j])){
                 cout << "graf nie jest sprzezony" << endl;
-                break;
+                goto non_coupled;
             }
         }
     }
@@ -137,7 +140,8 @@ int main(){
             cout << "graf jest sprzezony, ale nie liniowy" << endl;
         }
     }
-    
+non_coupled:
+    cout << "";
     // for(int i = 0; i < graph.size(); ++i){
     //     cout << graph[i].key << ":\t";
     //     for(int j = 0; j < graph[i].neighbours.size(); ++j){
