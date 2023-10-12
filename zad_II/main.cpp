@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -16,6 +17,43 @@ struct Node{
 };
 
 vector<Node> graph;
+bool coupled = true;
+
+bool Sorting_function(int i, int j){
+    if(i == j){
+        coupled = false;
+    }
+    return i < j;
+}
+
+void Check(vector<int> first, vector<int> second){
+    for(int i = 0, j = 0; i < first.size() && j < second.size();){
+        if(first[i] == second[j]){
+            if(first != second){
+                coupled = false;
+            }
+            return;
+        }
+        else{
+            if(first[i] > second[j]){
+                ++j;
+            }
+            else{
+                ++i;
+            }
+        }
+    }
+}
+
+bool Coupling_test(vector<int> first, vector<int> second){
+    sort(first.begin(), first.end(), Sorting_function);
+    sort(second.begin(), second.end(), Sorting_function);
+    Check(first, second);
+    if(coupled){
+        return true;
+    }
+    return false;
+}
 
 int main(){
     ifstream ifile("input.txt");
@@ -40,6 +78,20 @@ int main(){
                 graph[i].neighbours.push_back(stoi(number));
             }
         }
+    }
+    for(int i = 0; i < graph.size(); ++i){
+        for(int j = 0; j < graph.size(); ++j){
+            if(i == j){
+                continue;
+            }
+            if(!Coupling_test(graph[i].neighbours, graph[j].neighbours)){
+                cout << "graf nie jest sprzezony" << endl;
+                break;
+            }
+        }
+    }
+    if(coupled){
+        cout << "graf jest sprzezony" << endl;
     }
     for(int i = 0; i < graph.size(); ++i){
         cout << graph[i].key << ":\t";
