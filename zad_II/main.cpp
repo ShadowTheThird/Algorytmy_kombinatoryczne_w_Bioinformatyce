@@ -9,14 +9,16 @@
 #define vector std::vector
 
 struct Node{
-    int key;
+    int key, entering, leaving;
     vector<int> neighbours;
+    bool checked;
     Node(int _key){
         key = _key;
+        checked = false;
     }
 };
 
-vector<Node> graph;
+vector<Node> graph, original_graph;
 bool coupled = true, linear = true;
 
 bool Node_sorting_function(Node first, Node second){
@@ -49,7 +51,7 @@ void Check_coupling(vector<int> first, vector<int> second){
     }
 }
 
-Node Search_Node(int key){
+int Search_Node(int key){
     int id = key;
     if(id >= graph.size()){
         id = graph.size() - 1;
@@ -62,22 +64,23 @@ Node Search_Node(int key){
             --id;
         }
         if(!falesafe){
-            return Node(-1);
+            return -1;
         }
     }
-    return graph[id];
+    return id;
 }
+
 void Linearity_test(Node first){
     for(int i = 0; i < first.neighbours.size(); ++i){
         for(int j = 0; j < first.neighbours.size(); ++j){
             if(i == j){
                 continue;
             }
-            Node first_node = Search_Node(first.neighbours[i]), second_node = Search_Node(first.neighbours[j]);
-            if(first_node.key == -1 || second_node.key == -1){
+            int first_node = Search_Node(first.neighbours[i]), second_node = Search_Node(first.neighbours[j]);
+            if(first_node== -1 || second_node == -1){
                 continue;
             }
-            if(first_node.neighbours == second_node.neighbours && !first_node.neighbours.empty()){
+            if(graph[first_node].neighbours == graph[second_node].neighbours && !graph[first_node].neighbours.empty()){
                 linear = false;
                 return;
             }
@@ -128,7 +131,7 @@ int main(){
             }
             if(!Type_test(graph[i], graph[j])){
                 cout << "graf nie jest sprzezony" << endl;
-                goto non_coupled;
+                return 0;
             }
         }
     }
@@ -140,13 +143,46 @@ int main(){
             cout << "graf jest sprzezony, ale nie liniowy" << endl;
         }
     }
-non_coupled:
-    cout << "";
-    // for(int i = 0; i < graph.size(); ++i){
-    //     cout << graph[i].key << ":\t";
-    //     for(int j = 0; j < graph[i].neighbours.size(); ++j){
-    //         cout << graph[i].neighbours[j] << '\t';
-    //     }
-    //     cout << endl;
-    // }
+    for(int i = 0; i < graph.size(); ++i){
+        graph[i].leaving = 2*i;
+        graph[i].entering = 2*i+1;
+    }
+    for(int i = 0; i < graph.size(); ++i){
+        for(int j = 0; j < graph.size(); ++j){
+            if(graph[i].neighbours == graph[j].neighbours){
+                graph[j].entering = graph[i].entering;
+            }
+        }
+        for(int j = 0; j < graph[i].neighbours.size(); ++j){
+            graph[Search_Node(graph[i].neighbours[j])].leaving = graph[i].entering;
+        }
+    }
+    for(int i = 0; i < 2*graph.size(); ++i){
+        original_graph.push_back(Node(i));
+        for(int j = 0; j < graph.size(); ++j){
+            if(original_graph[i].key == graph[j].leaving){
+                original_graph[i].neighbours.push_back(graph[j].entering);
+                original_graph[i].checked = true;
+            }
+            if(original_graph[i].key == graph[j].entering){
+                original_graph[i].checked = true;
+            }
+        }
+    }
+    for(int i = 0; i < original_graph.size(); ++i){
+        if(!original_graph[i].checked){
+            Node temp = original_graph[i];
+            original_graph[i] = original_graph[original_graph.size()-1];
+            original_graph[original_graph.size()-1] = temp;
+            original_graph.pop_back();
+            --i;
+        }
+    }
+    for(int i = 0; i < original_graph.size(); ++i){
+        cout << original_graph[i].key << ":\t";
+        for(int j = 0; j < original_graph[i].neighbours.size(); ++j){
+            cout << original_graph[i].neighbours[j] << '\t';
+        }
+        cout << endl;
+    }
 }
