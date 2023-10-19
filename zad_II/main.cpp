@@ -6,6 +6,7 @@
 #define endl std::endl
 #define string std::string
 #define ifstream std::ifstream
+#define ofstream std::ofstream
 #define vector std::vector
 
 struct Node{
@@ -123,6 +124,7 @@ int main(){
             }
         }
     }
+    ifile.close();
     sort(graph.begin(), graph.end(), Node_sorting_function);
     for(int i = 0; i < graph.size(); ++i){
         for(int j = 0; j < graph.size(); ++j){
@@ -178,11 +180,12 @@ int main(){
             --i;
         }
     }
+    ofstream ofile("output.txt");
     for(int i = 0; i < original_graph.size(); ++i){
-        cout << original_graph[i].key << ":\t";
+        ofile << original_graph[i].key << ":\t";
         for(int j = 0; j < original_graph[i].neighbours.size(); ++j){
-            cout << original_graph[i].neighbours[j] << '\t';
+            ofile << original_graph[i].neighbours[j] << '\t';
         }
-        cout << endl;
+        ofile << endl;
     }
 }
