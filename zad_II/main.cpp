@@ -92,8 +92,10 @@ void Linearity_test(Node first){
 bool Type_test(Node first, Node second){
     sort(first.neighbours.begin(), first.neighbours.end(), Coupling_sorting_function);
     sort(second.neighbours.begin(), second.neighbours.end(), Coupling_sorting_function);
-    Check_coupling(first.neighbours, second.neighbours);
-    Linearity_test(first);
+    if(!first.neighbours.empty() && !second.neighbours.empty()){
+        Check_coupling(first.neighbours, second.neighbours);
+        Linearity_test(first);
+    }
     if(coupled){
         return true;
     }
@@ -182,9 +184,9 @@ int main(){
     }
     ofstream ofile("output.txt");
     for(int i = 0; i < original_graph.size(); ++i){
-        ofile << original_graph[i].key << ":\t";
+        ofile << original_graph[i].key << "->";
         for(int j = 0; j < original_graph[i].neighbours.size(); ++j){
-            ofile << original_graph[i].neighbours[j] << '\t';
+            ofile << original_graph[i].neighbours[j] << ',';
         }
         ofile << endl;
     }
