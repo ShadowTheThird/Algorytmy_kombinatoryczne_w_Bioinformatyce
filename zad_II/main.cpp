@@ -90,8 +90,6 @@ void Linearity_test(Node first){
 }
 
 bool Type_test(Node first, Node second){
-    sort(first.neighbours.begin(), first.neighbours.end(), Coupling_sorting_function);
-    sort(second.neighbours.begin(), second.neighbours.end(), Coupling_sorting_function);
     if(!first.neighbours.empty() && !second.neighbours.empty()){
         Check_coupling(first.neighbours, second.neighbours);
         Linearity_test(first);
@@ -129,11 +127,11 @@ int main(){
     ifile.close();
     sort(graph.begin(), graph.end(), Node_sorting_function);
     for(int i = 0; i < graph.size(); ++i){
-        for(int j = 0; j < graph.size(); ++j){
-            if(i == j){
-                continue;
-            }
-            if(!Type_test(graph[i], graph[j])){
+        sort(graph[i].neighbours.begin(), graph[i].neighbours.end(), Coupling_sorting_function);
+    }
+    for(int i = 0; i < graph.size(); ++i){
+        for(int j = 0; j < graph.size() - i; ++j){
+            if(!Type_test(graph[i], graph[i+j])){
                 cout << "graf nie jest sprzezony" << endl;
                 return 0;
             }
