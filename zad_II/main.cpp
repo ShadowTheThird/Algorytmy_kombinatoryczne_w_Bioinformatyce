@@ -37,6 +37,7 @@ void Check_coupling(vector<int> first, vector<int> second){
     for(int i = 0, j = 0; i < first.size() && j < second.size();){
         if(first[i] == second[j]){
             if(first != second){
+                cout << endl;
                 coupled = false;
             }
             return;
@@ -128,6 +129,10 @@ int main(){
     sort(graph.begin(), graph.end(), Node_sorting_function);
     for(int i = 0; i < graph.size(); ++i){
         sort(graph[i].neighbours.begin(), graph[i].neighbours.end(), Coupling_sorting_function);
+    }
+    if(!coupled){
+        cout << "graf nie jest sprzezony" << endl;
+        return 0;
     }
     for(int i = 0; i < graph.size(); ++i){
         for(int j = 0; j < graph.size() - i; ++j){
