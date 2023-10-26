@@ -37,7 +37,6 @@ void Check_coupling(vector<int> first, vector<int> second){
     for(int i = 0, j = 0; i < first.size() && j < second.size();){
         if(first[i] == second[j]){
             if(first != second){
-                cout << endl;
                 coupled = false;
             }
             return;
