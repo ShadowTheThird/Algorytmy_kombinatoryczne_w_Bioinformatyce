@@ -57,7 +57,7 @@ int Search_Node(int key){
     if(id >= graph.size()){
         id = graph.size() - 1;
     }
-    for(int falesafe = 20; graph[id].key != key; --falesafe){
+    for(int falesafe = id; graph[id].key != key; --falesafe){
         if(graph[id].key < key){
             ++id;
         }
@@ -143,7 +143,7 @@ int main(){
     }
     if(coupled){
         if(linear){
-            cout << "graf jest liniowy" << endl;
+            cout << "graf jest liniowy oraz sprzezony" << endl;
         }
         else{
             cout << "graf jest sprzezony, ale nie liniowy" << endl;
