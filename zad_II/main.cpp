@@ -133,12 +133,18 @@ int main(){
     }
     if(!coupled){
         cout << "graf nie jest sprzezony" << endl;
+        ofstream ofile("output.txt");
+        ofile << "nie sprzezony";
+        ofile.close();
         return 0;
     }
     for(int i = 0; i < graph.size(); ++i){
         for(int j = 0; j < graph.size() - i; ++j){
             if(!Type_test(graph[i], graph[i+j])){
                 cout << "graf nie jest sprzezony" << endl;
+                ofstream ofile("output.txt");
+                ofile << "nie sprzezony";
+                ofile.close();
                 return 0;
             }
         }
