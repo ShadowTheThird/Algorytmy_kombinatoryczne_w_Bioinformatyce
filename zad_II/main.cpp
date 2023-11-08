@@ -92,10 +92,12 @@ void Linearity_test(Node first){
 bool Type_test(Node first, Node second){
     if(!first.neighbours.empty() && !second.neighbours.empty()){
         Check_coupling(first.neighbours, second.neighbours);
-        Linearity_test(first);
     }
     if(coupled){
-        return true;
+        Linearity_test(first);
+        if(coupled){
+            return true;
+        }
     }
     return false;
 }
