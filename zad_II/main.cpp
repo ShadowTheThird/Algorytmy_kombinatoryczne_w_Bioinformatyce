@@ -57,7 +57,7 @@ int Search_Node(int key){
     if(id >= graph.size()){
         id = graph.size() - 1;
     }
-    for(int falesafe = id; graph[id].key != key; --falesafe){
+    for(int falesafe = graph.size(); graph[id].key != key; --falesafe){
         if(graph[id].key < key){
             ++id;
         }
