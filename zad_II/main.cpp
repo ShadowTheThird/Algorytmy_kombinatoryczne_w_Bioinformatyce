@@ -23,6 +23,10 @@ vector<Node> graph, original_graph;
 bool coupled = true, linear = true;
 
 bool Node_sorting_function(Node first, Node second){
+    if(first.key == second.key){
+        cout << "bledne etykietowanie wierzcholkow" << endl;
+        exit(0);
+    }
     return first.key < second.key;
 }
 
