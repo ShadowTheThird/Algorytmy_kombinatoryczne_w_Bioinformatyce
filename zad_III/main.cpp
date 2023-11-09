@@ -53,7 +53,7 @@ int main(){
         getline(fasta_file, fasta_line_2), getline(qual_file, qual_line_2);
         // cout << fasta_line_1 << '\t' << fasta_line_2 << endl;
         if(!sequences[fasta_line_1].Add_sequence(fasta_line_2)){
-            cout << "process failed due to sequence overwrite attempt";
+            cout << "process failed due to full_sequence overwrite attempt";
             return 0;
         }
         for(int k = 0; k < qual_line_2.length(); ++k){
@@ -73,7 +73,10 @@ int main(){
         fasta_file.close(), qual_file.close();
     }
     for(auto it = sequences.begin(); it != sequences.end(); ++it){
-        it->second.Asses_relevancy(20);
+        if(it->second.Asses_relevancy(20)){
+            cout << "process failed due to relevant_sequence overwrite attempt";
+            return 0;
+        }
     }
     cout << sequences.rbegin()->second.full_sequence << endl;
     for(auto it = sequences.rbegin()->second.relevant_sequence.begin(); it != sequences.rbegin()->second.relevant_sequence.end(); ++it){
