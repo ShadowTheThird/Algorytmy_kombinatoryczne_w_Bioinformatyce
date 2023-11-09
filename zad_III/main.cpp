@@ -16,6 +16,7 @@ struct Sequence{
     vector<short> quality;
     Sequence(){
         full_sequence = "";
+        relevant_sequence.clear();
     }
     bool Add_sequence(string _sequence){
         if(full_sequence == ""){
@@ -26,6 +27,13 @@ struct Sequence{
     }
     void Add_quality(int _quality){
         quality.push_back(_quality);
+    }
+    bool Quantity_check(){
+        if(quality.size() == full_sequence.length()){
+            return true;
+        }
+        cout << "quality: " << quality.size() << "\tsequence: " << full_sequence.length();
+        return false; 
     }
     bool Asses_relevancy(int _minimal_quality){
         if(relevant_sequence.empty()){
@@ -73,13 +81,12 @@ int main(){
         fasta_file.close(), qual_file.close();
     }
     for(auto it = sequences.begin(); it != sequences.end(); ++it){
-        if(it->second.Asses_relevancy(20)){
-            cout << "process failed due to relevant_sequence overwrite attempt";
-            return 0;
+        if(it->second.Quantity_check()){
+            if(!it->second.Asses_relevancy(20)){
+                cout << "process failed due to relevant_sequence overwrite attempt";
+                return 0;
+            }
         }
     }
-    cout << sequences.rbegin()->second.full_sequence << endl;
-    for(auto it = sequences.rbegin()->second.relevant_sequence.begin(); it != sequences.rbegin()->second.relevant_sequence.end(); ++it){
-        cout << it->second;
-    }
+    
 }
