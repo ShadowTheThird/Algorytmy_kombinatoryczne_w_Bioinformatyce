@@ -48,7 +48,14 @@ struct Sequence{
     }
 };
 
+struct Edge{
+    string entering;
+    int weight;
+    Edge(string _entering, int _weight):entering(_entering),weight(_weight){}
+};
+
 map<string, Sequence> sequences;
+map<string, map<string, int>> graph; //etykieta, plik, lokalizacja
 
 int main(){
     string fasta = "fasta\\sequence_0.fasta", qual = "qual\\sequence_0.qual", fasta_line_1 = "", fasta_line_2 = "", qual_line_1 = "", qual_line_2 = "";
@@ -88,5 +95,11 @@ int main(){
             }
         }
     }
-    
+    int label_length = 5;
+    for(auto it_1 = sequences.begin(); it_1 != sequences.end(); ++it_1){
+        string label[5] = "";
+        for(auto it_2 = it_1->second.relevant_sequence.begin(); it_2 != it_1->second.relevant_sequence.end(); ++it_2){
+            
+        }
+    }
 }
