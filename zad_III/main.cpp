@@ -1,3 +1,4 @@
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -48,14 +49,32 @@ struct Sequence{
     }
 };
 
-struct Edge{
-    string entering;
-    int weight;
-    Edge(string _entering, int _weight):entering(_entering),weight(_weight){}
+struct Motif{
+    int position;
+    string sequence = "";
 };
 
 map<string, Sequence> sequences;
-map<string, map<string, int>> graph; //etykieta, plik, lokalizacja
+map<string, map<string, vector<int>>> graph; //etykieta, plik, lokalizacja
+
+Motif Search_first(){
+    Motif motif;
+    int lowest = graph.begin()->second.begin()->second[0];
+    string sequence = graph.begin()->first;
+    for(auto it_1 = graph.begin(); it_1 != graph.end(); ++it_1){
+        for(auto it_2 = it_1->second.begin(); it_2 != it_1->second.end(); ++it_2){
+            for(int i = 0; i < it_2->second.size(); ++i){
+                if(it_2->second[i] < lowest){
+                    lowest = it_2->second[i];
+                    sequence = it_1->first;
+                }
+            }
+        }
+    }
+    motif.position = lowest;
+    motif.sequence = sequence;
+    return motif;
+}
 
 int main(){
     string fasta = "fasta\\sequence_0.fasta", qual = "qual\\sequence_0.qual", fasta_line_1 = "", fasta_line_2 = "", qual_line_1 = "", qual_line_2 = "";
@@ -95,11 +114,106 @@ int main(){
             }
         }
     }
-    int label_length = 5;
+    int k = 5;
+    ofstream ofile("output.txt");
     for(auto it_1 = sequences.begin(); it_1 != sequences.end(); ++it_1){
-        string label[5] = "";
-        for(auto it_2 = it_1->second.relevant_sequence.begin(); it_2 != it_1->second.relevant_sequence.end(); ++it_2){
-            
+        Motif *label = new Motif[k];
+        int i = 0;
+        for(auto it_2 = it_1->second.relevant_sequence.begin(); it_2 != it_1->second.relevant_sequence.end(); ++it_2, ++i){
+            if(i < k){
+                // popraw to leniwy kurwiu
+                switch(i){
+                    case 4:
+                        label[4].position = it_2->first;
+                        label[4].sequence += it_2->second;
+                        label[3].sequence += it_2->second;
+                        label[2].sequence += it_2->second;
+                        label[1].sequence += it_2->second;
+                        label[0].sequence += it_2->second;
+                        break;
+                    case 3:
+                        label[3].position = it_2->first;
+                        label[3].sequence += it_2->second;
+                        label[2].sequence += it_2->second;
+                        label[1].sequence += it_2->second;
+                        label[0].sequence += it_2->second;
+                        break;
+                    case 2:
+                        label[2].position = it_2->first;
+                        label[2].sequence += it_2->second;
+                        label[1].sequence += it_2->second;
+                        label[0].sequence += it_2->second;
+                        break;                
+                    case 1:
+                        label[1].position = it_2->first;
+                        label[1].sequence += it_2->second;
+                        label[0].sequence += it_2->second;
+                        break;
+                    case 0:
+                        label[0].position = it_2->first;
+                        label[0].sequence += it_2->second;
+                        break;
+                    default:
+                        cout << "problem with switch cases" << endl;
+                        return 0;
+                }
+            }
+            else{
+                graph[label[i - (5*(i/5))].sequence][it_1->first].push_back(label[i - (5*(i/5))].position);
+                label[i - (5*(i/5))].sequence = "", label[i - (5*(i/5))].position = it_2->first;
+                label[0].sequence += it_2->second, label[1].sequence += it_2->second, label[2].sequence += it_2->second, label[3].sequence += it_2->second, label[4].sequence += it_2->second;
+            }
         }
+    }
+    for(auto it = graph.begin(); it != graph.end(); ++it){
+        if(it->second.size() != 5){
+            graph.erase(it);
+            --it;
+        }
+    }
+    cout << graph.size() << endl;
+    while(graph.size()){
+        Motif potential_motif = Search_first();
+        bool within_range = true;
+        for(auto it = graph[potential_motif.sequence].begin(); it != graph[potential_motif.sequence].end(); ++it){
+            if(it->second.size() > 1){
+                bool at_least_one_within_range = false;
+                for(int i = 0; i < it->second.size(); ++i){
+                    if(abs(it->second[i]-potential_motif.position) <= 10*k){
+                        at_least_one_within_range = true;
+                        break;
+                    }
+                }
+                if(at_least_one_within_range){
+                    continue;
+                }
+                within_range = false;
+                break;
+            }
+            if(abs(it->second[0]-potential_motif.position) > 10*k){
+                within_range = false;
+                break;
+            }
+        }
+        if(within_range){
+            cout << graph[potential_motif.sequence].size() << endl;
+            cout << potential_motif.sequence << endl;
+            for(auto it = graph[potential_motif.sequence].begin(); it != graph[potential_motif.sequence].end(); ++it){
+                cout << it->first << ":\t";
+                if(it->second.size() > 1){
+                    int lowest = abs(it->second[0] - potential_motif.position), position_id = 0;
+                    for(int i = 0; i < it->second.size(); ++i){
+                        if(abs(it->second[i] - potential_motif.position) < lowest){
+                            lowest = abs(it->second[i] - potential_motif.position), position_id = i;
+                        }
+                    }
+                    cout << it->second[position_id] << endl;
+                    continue;
+                }
+                cout << it->second[0] << endl;
+            }
+            return 0;
+        }
+        graph.erase(potential_motif.sequence);
     }
 }
