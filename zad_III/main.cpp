@@ -40,7 +40,7 @@ struct Sequence{
         if(relevant_sequence.empty()){
             for(int i = 0; i < quality.size(); ++i){
                 if(quality[i] >= _minimal_quality){
-                    relevant_sequence[i] = full_sequence[i];
+                    relevant_sequence[i+1] = full_sequence[i];
                 }
             }
             return true;
@@ -55,7 +55,7 @@ struct Motif{
 };
 
 map<string, Sequence> sequences;
-map<string, map<string, vector<int>>> graph; //etykieta, plik, lokalizacja
+map<string, map<string, vector<int>>> graph, temp; //etykieta, plik, lokalizacja
 
 Motif Search_first(){
     Motif motif;
@@ -121,57 +121,28 @@ int main(){
         int i = 0;
         for(auto it_2 = it_1->second.relevant_sequence.begin(); it_2 != it_1->second.relevant_sequence.end(); ++it_2, ++i){
             if(i < k){
-                // popraw to leniwy kurwiu
-                switch(i){
-                    case 4:
-                        label[4].position = it_2->first;
-                        label[4].sequence += it_2->second;
-                        label[3].sequence += it_2->second;
-                        label[2].sequence += it_2->second;
-                        label[1].sequence += it_2->second;
-                        label[0].sequence += it_2->second;
-                        break;
-                    case 3:
-                        label[3].position = it_2->first;
-                        label[3].sequence += it_2->second;
-                        label[2].sequence += it_2->second;
-                        label[1].sequence += it_2->second;
-                        label[0].sequence += it_2->second;
-                        break;
-                    case 2:
-                        label[2].position = it_2->first;
-                        label[2].sequence += it_2->second;
-                        label[1].sequence += it_2->second;
-                        label[0].sequence += it_2->second;
-                        break;                
-                    case 1:
-                        label[1].position = it_2->first;
-                        label[1].sequence += it_2->second;
-                        label[0].sequence += it_2->second;
-                        break;
-                    case 0:
-                        label[0].position = it_2->first;
-                        label[0].sequence += it_2->second;
-                        break;
-                    default:
-                        cout << "problem with switch cases" << endl;
-                        return 0;
+                label[i].position = it_2->first;
+                for(int j = 0; j <= i; ++j){
+                    label[j].sequence += it_2->second;
                 }
             }
             else{
-                graph[label[i - (5*(i/5))].sequence][it_1->first].push_back(label[i - (5*(i/5))].position);
-                label[i - (5*(i/5))].sequence = "", label[i - (5*(i/5))].position = it_2->first;
-                label[0].sequence += it_2->second, label[1].sequence += it_2->second, label[2].sequence += it_2->second, label[3].sequence += it_2->second, label[4].sequence += it_2->second;
+                graph[label[i - (k*(i/k))].sequence][it_1->first].push_back(label[i - (k*(i/k))].position);
+                label[i - (k*(i/k))].sequence = "", label[i - (k*(i/k))].position = it_2->first;
+                for(int j = 0; j < k; ++j){
+                    label[j].sequence += it_2->second;
+                }
             }
         }
     }
     for(auto it = graph.begin(); it != graph.end(); ++it){
-        if(it->second.size() != 5){
-            graph.erase(it);
-            --it;
+        if(it->second.size() == 5){
+            temp[it->first] = it->second;
         }
     }
-    cout << graph.size() << endl;
+    graph.clear();
+    graph = temp;
+    temp.clear();
     while(graph.size()){
         Motif potential_motif = Search_first();
         bool within_range = true;
