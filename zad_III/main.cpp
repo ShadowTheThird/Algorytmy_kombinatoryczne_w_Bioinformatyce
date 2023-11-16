@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #define cout std::cout
+#define cin std::cin
 #define endl std::endl
 #define string std::string
 #define ifstream std::ifstream
@@ -57,6 +58,15 @@ struct Motif{
 map<string, Sequence> sequences;
 map<string, map<string, vector<int>>> graph, temp; //etykieta, plik, lokalizacja
 
+int Find_position(string _string){
+    for(int i = _string.length() - 1; i >= 0; --i){
+        if(isdigit(_string[i])){
+            return i;
+        }
+    }
+    return _string.length();
+}
+
 Motif Search_first(){
     Motif motif;
     int lowest = graph.begin()->second.begin()->second[0];
@@ -80,7 +90,7 @@ int main(){
     string fasta = "fasta\\sequence_0.fasta", qual = "qual\\sequence_0.qual", fasta_line_1 = "", fasta_line_2 = "", qual_line_1 = "", qual_line_2 = "";
     ifstream fasta_file, qual_file;
     for(int i = 1; i <= 5; ++i){
-        fasta[15] = i+'0', qual[14] = i+'0';
+        fasta[Find_position(fasta)] = i+'0', qual[Find_position(qual)] = i+'0';
         fasta_file.open(fasta), qual_file.open(qual);
         // cout << fasta << endl;
         getline(fasta_file, fasta_line_1), getline(qual_file, qual_line_1);
@@ -90,46 +100,51 @@ int main(){
             cout << "process failed due to full_sequence overwrite attempt";
             return 0;
         }
-        for(int k = 0; k < qual_line_2.length(); ++k){
+        for(int label_length = 0; label_length < qual_line_2.length(); ++label_length){
             string number = "";
-            for(;isdigit(qual_line_2[k]); ++k){
-                number += qual_line_2[k];
+            for(;isdigit(qual_line_2[label_length]); ++label_length){
+                number += qual_line_2[label_length];
             }
             if(number != ""){
                 sequences[qual_line_1].Add_quality(stoi(number));
             }
         }
-        // cout << sequences[fasta_line_1].full_sequence << endl;
-        // for(int j = 0; j < sequences[qual_line_1].quality.size(); ++j){
-        //     cout << sequences[qual_line_1].quality[j] << '\t';
-        // }
-        // cout << endl;
         fasta_file.close(), qual_file.close();
+    }
+    int label_length = 5, relevant_quality = 20;
+    cout << "input relevant quality threshold:\t";
+    cin >> relevant_quality;
+    while(true){
+        cout << "input searched motif length:\t";
+        cin >> label_length;
+        if(label_length < 4 || label_length > 9){
+            cout << "searched motifs length is to be between 4 and 9 inclusive" << endl;
+            continue;
+        }
+        break;
     }
     for(auto it = sequences.begin(); it != sequences.end(); ++it){
         if(it->second.Quantity_check()){
-            if(!it->second.Asses_relevancy(20)){
+            if(!it->second.Asses_relevancy(relevant_quality)){
                 cout << "process failed due to relevant_sequence overwrite attempt";
                 return 0;
             }
         }
     }
-    int k = 5;
-    ofstream ofile("output.txt");
     for(auto it_1 = sequences.begin(); it_1 != sequences.end(); ++it_1){
-        Motif *label = new Motif[k];
+        Motif *label = new Motif[label_length];
         int i = 0;
         for(auto it_2 = it_1->second.relevant_sequence.begin(); it_2 != it_1->second.relevant_sequence.end(); ++it_2, ++i){
-            if(i < k){
+            if(i < label_length){
                 label[i].position = it_2->first;
                 for(int j = 0; j <= i; ++j){
                     label[j].sequence += it_2->second;
                 }
             }
             else{
-                graph[label[i - (k*(i/k))].sequence][it_1->first].push_back(label[i - (k*(i/k))].position);
-                label[i - (k*(i/k))].sequence = "", label[i - (k*(i/k))].position = it_2->first;
-                for(int j = 0; j < k; ++j){
+                graph[label[i - (label_length*(i/label_length))].sequence][it_1->first].push_back(label[i - (label_length*(i/label_length))].position);
+                label[i - (label_length*(i/label_length))].sequence = "", label[i - (label_length*(i/label_length))].position = it_2->first;
+                for(int j = 0; j < label_length; ++j){
                     label[j].sequence += it_2->second;
                 }
             }
@@ -150,7 +165,7 @@ int main(){
             if(it->second.size() > 1){
                 bool at_least_one_within_range = false;
                 for(int i = 0; i < it->second.size(); ++i){
-                    if(abs(it->second[i]-potential_motif.position) <= 10*k){
+                    if(abs(it->second[i]-potential_motif.position) <= 10*label_length){
                         at_least_one_within_range = true;
                         break;
                     }
@@ -161,19 +176,18 @@ int main(){
                 within_range = false;
                 break;
             }
-            if(abs(it->second[0]-potential_motif.position) > 10*k){
+            if(abs(it->second[0] - potential_motif.position) > 10*label_length){
                 within_range = false;
                 break;
             }
         }
         if(within_range){
-            cout << graph[potential_motif.sequence].size() << endl;
             cout << potential_motif.sequence << endl;
             for(auto it = graph[potential_motif.sequence].begin(); it != graph[potential_motif.sequence].end(); ++it){
                 cout << it->first << ":\t";
                 if(it->second.size() > 1){
                     int lowest = abs(it->second[0] - potential_motif.position), position_id = 0;
-                    for(int i = 0; i < it->second.size(); ++i){
+                    for(int i = 1; i < it->second.size(); ++i){
                         if(abs(it->second[i] - potential_motif.position) < lowest){
                             lowest = abs(it->second[i] - potential_motif.position), position_id = i;
                         }
@@ -187,4 +201,5 @@ int main(){
         }
         graph.erase(potential_motif.sequence);
     }
+    cout << "could not find searched motif with given parameters" << endl;
 }
