@@ -56,7 +56,7 @@ struct Motif{
 };
 
 map<string, Sequence> sequences;
-map<string, map<string, vector<int>>> graph, temp; //etykieta, plik, lokalizacja
+map<string, map<string, vector<int>>> graph, temp;
 
 int Find_position(string _string){
     for(int i = _string.length() - 1; i >= 0; --i){
@@ -92,10 +92,8 @@ int main(){
     for(int i = 1; i <= 5; ++i){
         fasta[Find_position(fasta)] = i+'0', qual[Find_position(qual)] = i+'0';
         fasta_file.open(fasta), qual_file.open(qual);
-        // cout << fasta << endl;
         getline(fasta_file, fasta_line_1), getline(qual_file, qual_line_1);
         getline(fasta_file, fasta_line_2), getline(qual_file, qual_line_2);
-        // cout << fasta_line_1 << '\t' << fasta_line_2 << endl;
         if(!sequences[fasta_line_1].Add_sequence(fasta_line_2)){
             cout << "process failed due to full_sequence overwrite attempt";
             return 0;
