@@ -1,0 +1,23 @@
+5|25
+GCATG
+>DOJHLOP01AUM5Y length=104 xy=0231_3636 region=1 run=R_2005_09_08_15_35_38_:    10
+>DOJHLOP02FU6TN length=110 xy=2288_1721 region=2 run=R_2005_09_08_15_35_38_:    17
+>DOJHLOP02H03UH length=95 xy=3175_3879 region=2 run=R_2005_09_08_15_35_38_:     5
+>DOJHLOP02ISHDM length=115 xy=3487_3176 region=2 run=R_2005_09_08_15_35_38_:    10
+>DOJHLOP02JOM3X length=113 xy=3854_0363 region=2 run=R_2005_09_08_15_35_38_:    26
+-----------------------------------------------------------------------------------
+4|10
+AAGA
+>DOJHLOP01AUM5Y length=104 xy=0231_3636 region=1 run=R_2005_09_08_15_35_38_:    58
+>DOJHLOP02FU6TN length=110 xy=2288_1721 region=2 run=R_2005_09_08_15_35_38_:    52
+>DOJHLOP02H03UH length=95 xy=3175_3879 region=2 run=R_2005_09_08_15_35_38_:     54
+>DOJHLOP02ISHDM length=115 xy=3487_3176 region=2 run=R_2005_09_08_15_35_38_:    82
+>DOJHLOP02JOM3X length=113 xy=3854_0363 region=2 run=R_2005_09_08_15_35_38_:    49
+-----------------------------------------------------------------------------------
+8|12
+GAAGAAGG
+>DOJHLOP01AUM5Y length=104 xy=0231_3636 region=1 run=R_2005_09_08_15_35_38_:    57
+>DOJHLOP02FU6TN length=110 xy=2288_1721 region=2 run=R_2005_09_08_15_35_38_:    51
+>DOJHLOP02H03UH length=95 xy=3175_3879 region=2 run=R_2005_09_08_15_35_38_:     53
+>DOJHLOP02ISHDM length=115 xy=3487_3176 region=2 run=R_2005_09_08_15_35_38_:    81
+>DOJHLOP02JOM3X length=113 xy=3854_0363 region=2 run=R_2005_09_08_15_35_38_:    11

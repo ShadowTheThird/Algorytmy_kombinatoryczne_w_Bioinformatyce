@@ -73,9 +73,9 @@ int main(){
     int random = rand()%(format[id].second.first.length() - 40) + 31;
     for(int i = 0; i < 5; ++i){
         ofile << format[i].first << endl;
-        int offset = rand()%81 - 40;
+        int offset = rand()%41 - 20;
         while(random + offset + 9 > format[i].second.first.length()){
-            offset = rand()%81 - 40;
+            offset = rand()%41 - 20;
         }
         string sequence = format[i].second.first.substr(0, random + offset), quality;
         sequence += "TTTTTTTTT";

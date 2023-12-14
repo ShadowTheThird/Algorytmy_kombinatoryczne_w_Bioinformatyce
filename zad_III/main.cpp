@@ -107,7 +107,7 @@ int main(){
             }
         }
         else{
-            cout << "ERROR\nmissmatched sequence length and quality count";
+            cout << it->first << "\nmissmatched sequence length and quality count";
             return 0;
         }
     }
@@ -122,7 +122,7 @@ int main(){
                 }
             }
             else{
-                int temp = i - (label_length*(i/label_length));
+                int temp = i % label_length;
                 graph[label[temp].sequence][it_1->first].push_back(label[temp].position);
                 label[temp].sequence = "", label[temp].position = it_2->first;
                 for(int j = 0; j < label_length; ++j){
@@ -130,6 +130,8 @@ int main(){
                 }
             }
         }
+        int temp = i % label_length;
+        graph[label[temp].sequence][it_1->first].push_back(label[temp].position);
     }
     for(auto it = graph.begin(); it != graph.end(); ++it){
         if(it->second.size() == 5){
@@ -178,9 +180,8 @@ int main(){
                 }
                 cout << it->second[0] << endl;
             }
-            return 0;
+            cout << endl;
         }
-        graph.erase(potential_motif.sequence);
     }
-    cout << "could not find searched motif with given parameters" << endl;
+    cout << "could not find more motifs with given parameters" << endl;
 }
