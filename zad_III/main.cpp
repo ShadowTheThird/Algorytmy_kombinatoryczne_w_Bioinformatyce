@@ -130,6 +130,8 @@ int main(){
                 }
             }
         }
+        int temp = i - (label_length*(i/label_length));
+        graph[label[temp].sequence][it_1->first].push_back(label[temp].position);
     }
     for(auto it = graph.begin(); it != graph.end(); ++it){
         if(it->second.size() == 5){
@@ -178,9 +180,8 @@ int main(){
                 }
                 cout << it->second[0] << endl;
             }
-            return 0;
+            cout << endl;   
         }
-        graph.erase(potential_motif.sequence);
     }
-    cout << "could not find searched motif with given parameters" << endl;
+    cout << "could not find more motifs with given parameters" << endl;
 }
