@@ -130,7 +130,11 @@ int main(){
                 }
             }
         }
+<<<<<<< HEAD
         int temp = i % label_length;
+=======
+        int temp = i - (label_length*(i/label_length));
+>>>>>>> a843d5a532e2c97e14669a79956bf6333f15a742
         graph[label[temp].sequence][it_1->first].push_back(label[temp].position);
     }
     for(auto it = graph.begin(); it != graph.end(); ++it){ // 1 <-> nlogn
@@ -180,7 +184,11 @@ int main(){
                 }
                 cout << it->second[0] << endl;
             }
+<<<<<<< HEAD
             cout << endl;
+=======
+            cout << endl;   
+>>>>>>> a843d5a532e2c97e14669a79956bf6333f15a742
         }
     }
     cout << "could not find more motifs with given parameters" << endl;
