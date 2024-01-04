@@ -99,7 +99,7 @@ int main(){
         }
         break;
     }
-    for(auto it = sequences.begin(); it != sequences.end(); ++it){
+    for(auto it = sequences.begin(); it != sequences.end(); ++it){ //nlogn
         if(it->second.Quantity_check()){
             if(!it->second.Asses_relevancy(relevant_quality)){
                 cout << "process failed due to relevant_sequence overwrite attempt";
@@ -111,7 +111,7 @@ int main(){
             return 0;
         }
     }
-    for(auto it_1 = sequences.begin(); it_1 != sequences.end(); ++it_1){
+    for(auto it_1 = sequences.begin(); it_1 != sequences.end(); ++it_1){ // nlogn
         Motif *label = new Motif[label_length];
         int i = 0;
         for(auto it_2 = it_1->second.relevant_sequence.begin(); it_2 != it_1->second.relevant_sequence.end(); ++it_2, ++i){
@@ -133,7 +133,7 @@ int main(){
         int temp = i % label_length;
         graph[label[temp].sequence][it_1->first].push_back(label[temp].position);
     }
-    for(auto it = graph.begin(); it != graph.end(); ++it){
+    for(auto it = graph.begin(); it != graph.end(); ++it){ // 1 <-> nlogn
         if(it->second.size() == 5){
             temp[it->first] = it->second;
         }
@@ -141,13 +141,13 @@ int main(){
     graph.clear();
     graph = temp;
     temp.clear();
-    for(auto it = graph.begin(); it != graph.end(); ++it){
+    for(auto it = graph.begin(); it != graph.end(); ++it){ // 1 <-> nlogn
         Motif potential_motif(it->first, it->second.begin()->second[0]);
         bool within_range = true;
-        for(auto it = graph[potential_motif.sequence].begin(); it != graph[potential_motif.sequence].end(); ++it){
+        for(auto it = graph[potential_motif.sequence].begin(); it != graph[potential_motif.sequence].end(); ++it){ // 5
             if(it->second.size() > 1){
                 bool at_least_one_within_range = false;
-                for(int i = 0; i < it->second.size(); ++i){
+                for(int i = 0; i < it->second.size(); ++i){ // 1 <-> n
                     if(abs(it->second[i]-potential_motif.position) <= 10*label_length){
                         at_least_one_within_range = true;
                         break;
