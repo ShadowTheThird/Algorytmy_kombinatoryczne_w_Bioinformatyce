@@ -5,8 +5,8 @@ using namespace std;
 
 int main(){
     vector<int> mapka;
-    int babajaga[21] = {4, 2, 5, 6, 2, 3, 7, 9, 1, 4, 2, 3, 4, 6, 5, 5, 1, 2, 2, 3, 7};
-    for(int i = 0; i < 21; ++i){
+    int babajaga[18] = {3, 2, 6, 4, 3, 4, 6, 2, 3, 2, 4, 6, 3, 6, 4, 2, 3, 9};
+    for(int i = 0; i < 18; ++i){
         int sum = 0;
         for(int j = i; j >= 0; --j){
             sum += babajaga[j];
@@ -17,4 +17,7 @@ int main(){
     for(int i = 0; i < mapka.size(); ++i){
         cout << mapka[i] << ' ';
     }
+    int a = 5;
+    int *p = &a;
+    int *pp = p+1;
 }

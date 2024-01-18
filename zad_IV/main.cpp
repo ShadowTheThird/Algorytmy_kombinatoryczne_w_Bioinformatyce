@@ -1,4 +1,5 @@
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -7,7 +8,6 @@
 
 std::vector<int> thingy_thing;
 std::multiset<int> values;
-std::ofstream ofile("output.txt");
 
 bool Mapper(){
     if(!values.size()){
@@ -31,7 +31,6 @@ bool Mapper(){
             }
         }
         if(suitable){
-            ofile << new_key << std::endl;
             if(Mapper()){
                 return true;
             }
@@ -58,6 +57,10 @@ int main(){
         }
     }
     std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+    if(ceil((sqrt(1 + 8 * values.size()) - 3)/2) != floor((sqrt(1 + 8 * values.size()) - 3)/2)){
+        std::cout << "incomplete data set" << std::endl;
+        return 0;
+    }
     int key = *(values.rbegin()) - *(++values.rbegin());
     if(values.find(key) != values.end()){
         values.erase(values.find(key));
@@ -72,5 +75,5 @@ int main(){
             return 0;
         }
     }
-    std::cout << "provided data is incomplete" << std::endl;
+    std::cout << "couldn't recreate map based on provided data set" << std::endl;
 }
