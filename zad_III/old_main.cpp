@@ -1,187 +1,108 @@
-#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <set>
+#include <string>
+#include <utility>
 #include <vector>
-#define cout std::cout
-#define cin std::cin
-#define endl std::endl
-#define string std::string
-#define ifstream std::ifstream
-#define ofstream std::ofstream
-#define vector std::vector
-#define map std::map
 
-struct Sequence{
-    string full_sequence; 
-    map<int, char> relevant_sequence;
-    vector<short> quality;
-    Sequence(){
-        full_sequence = "";
-        relevant_sequence.clear();
-    }
-    bool Add_sequence(string _sequence){
-        if(full_sequence == ""){
-            full_sequence = _sequence;
-            return true;
-        }
-        cout << "sequence overwrite attempt detected" << endl;
-        return false;
-    }
-    void Add_quality(vector<short> _quality){
-        quality = _quality;
-    }
-    bool Quantity_check(){
-        if(quality.size() == full_sequence.length()){
-            return true;
-        }
-        cout << "quality: " << quality.size() << "\tsequence: " << full_sequence.length() << endl;
-        return false; 
-    }
-    bool Asses_relevancy(int _minimal_quality){
-        if(relevant_sequence.empty()){
-            for(int i = 0; i < quality.size(); ++i){
-                if(quality[i] >= _minimal_quality){
-                    relevant_sequence[i+1] = full_sequence[i];
-                }
-            }
-            return true;
-        }
-        return false;
-    }
+struct Sequences{
+    std::string name, original_sequence;
+    std::vector<int> qual;
 };
 
-struct Motif{
+struct Node{
     int position;
-    string sequence = "";
-    Motif(string _sequence, int _position):sequence(_sequence),position(_position){}
-    Motif(){}
+    std::string name;
+    std::set<Node*> connections;
+    Node(int _position):position(_position){}
 };
 
-map<string, Sequence> sequences;
-map<string, map<string, vector<int>>> graph, temp;
+std::map<std::string, std::vector<std::pair<std::string, int>>> segments, temp;
+std::map<std::string, std::vector<Node>> graphs;
+Sequences sequences[5];
 
 int main(){
-    ifstream ifile("input.txt");
-    string line;
-    while(getline(ifile, line)){
+    std::ifstream ifile("input.txt");
+    std::string line;
+    int qual_limit = 10, motif_size = 6;
+    for(int i = 0; getline(ifile, line); ++i){
         if(line[0] == '>'){
-            string sequence, quality;
+            std::string sequence, quality;
             getline(ifile, sequence);
             getline(ifile, quality);
-            if(!sequences[line].Add_sequence(sequence)){
-                cout << "ERROR" << endl;
-                return 0;
-            }
-            vector<short> temp_qual;
-            for(int i = 0; i < quality.size(); ++i){
-                string number = "";
-                for(; quality[i] != ' '; ++i){
-                    number += quality[i];
+            sequences[i].name = line;
+            sequences[i].original_sequence = sequence;
+            for(int j = 0; j < quality.size(); ++j){
+                std::string number = "";
+                for(; isdigit(quality[j]); ++j){
+                    number += quality[j];
                 }
-                temp_qual.push_back(stoi(number));
-            }
-            sequences[line].Add_quality(temp_qual);
-        }
-        else{
-            cout << "ERROR\nincorrect file format detected" << endl;
-        }
-    }
-    int label_length = 5, relevant_quality = 20;
-    cout << "input relevant quality threshold:\t";
-    cin >> relevant_quality;
-    while(true){
-        cout << "input searched motif length:\t";
-        cin >> label_length;
-        if(label_length < 4 || label_length > 9){
-            cout << "searched motifs length is to be between 4 and 9 inclusive" << endl;
-            continue;
-        }
-        break;
-    }
-    for(auto it = sequences.begin(); it != sequences.end(); ++it){ //nlogn
-        if(it->second.Quantity_check()){
-            if(!it->second.Asses_relevancy(relevant_quality)){
-                cout << "process failed due to relevant_sequence overwrite attempt";
-                return 0;
+                sequences[i].qual.push_back(stoi(number));
             }
         }
         else{
-            cout << it->first << "\nmissmatched sequence length and quality count";
-            return 0;
+            std::cout << "ERROR\nincorrect file format detected" << std::endl;
         }
     }
-    for(auto it_1 = sequences.begin(); it_1 != sequences.end(); ++it_1){ // nlogn
-        Motif *label = new Motif[label_length];
-        int i = 0;
-        for(auto it_2 = it_1->second.relevant_sequence.begin(); it_2 != it_1->second.relevant_sequence.end(); ++it_2, ++i){
-            if(i < label_length){
-                label[i].position = it_2->first;
-                for(int j = 0; j <= i; ++j){
-                    label[j].sequence += it_2->second;
-                }
+    // std::cin >> qual_limit >> motif_size;
+    for(int i = 0; i < 5; ++i){
+        std::string k_mer = "";
+        std::set<int> positions;
+        for(int j = 0; j < sequences[i].original_sequence.length(); ++j){
+            if(sequences[i].qual[j] >= qual_limit){
+                k_mer += sequences[i].original_sequence[j];
+                positions.insert(j+1);
             }
-            else{
-                int temp = i % label_length;
-                graph[label[temp].sequence][it_1->first].push_back(label[temp].position);
-                label[temp].sequence = "", label[temp].position = it_2->first;
-                for(int j = 0; j < label_length; ++j){
-                    label[j].sequence += it_2->second;
-                }
+            if(k_mer.length() == motif_size){
+                segments[k_mer].push_back(std::make_pair(sequences[i].name, *positions.begin()));
+                k_mer = k_mer.substr(1);
+                positions.erase(positions.begin());
             }
         }
-        int temp = i % label_length;
-        graph[label[temp].sequence][it_1->first].push_back(label[temp].position);
     }
-    for(auto it = graph.begin(); it != graph.end(); ++it){ // 1 <-> nlogn
-        if(it->second.size() == 5){
-            temp[it->first] = it->second;
+    for(auto it = segments.begin(); it != segments.end(); ++it){
+        if(it->second.size() >= 5){
+            temp.insert(*it);
         }
     }
-    graph.clear();
-    graph = temp;
-    temp.clear();
-    for(auto it = graph.begin(); it != graph.end(); ++it){ // 1 <-> nlogn
-        Motif potential_motif(it->first, it->second.begin()->second[0]);
-        bool within_range = true;
-        for(auto it = graph[potential_motif.sequence].begin(); it != graph[potential_motif.sequence].end(); ++it){ // 5
-            if(it->second.size() > 1){
-                bool at_least_one_within_range = false;
-                for(int i = 0; i < it->second.size(); ++i){ // 1 <-> n
-                    if(abs(it->second[i]-potential_motif.position) <= 10*label_length){
-                        at_least_one_within_range = true;
-                        break;
+    segments = temp;
+    for(auto it = segments.begin(); it!= segments.end(); ++it){
+        std::cout << it->first << std::endl;
+    }
+    for(auto it = segments.begin(); it!= segments.end(); ++it){
+        for(int i = 0; i < it->second.size(); ++i){
+            graphs[it->first].push_back(Node(it->second[i].second));
+        }
+    }
+    for(auto it = graphs.begin(); it!= graphs.end(); ++it){
+        for(int i = 0; i < it->second.size(); ++i){
+            for(int j = i+1; j < it->second.size(); ++j){
+                if(it->second[i].position + 1 == it->second[j].position){
+                    it->second[i].connections.insert(&it->second[j]);
+                    it->second[j].connections.insert(&it->second[i]);
+                }
+            }
+        }
+    }
+    for(auto it = graphs.begin(); it!= graphs.end(); ++it){
+        for(int i = 0; i < it->second.size(); ++i){
+            std::set<Node*> shared_connections = it->second[i].connections;
+            shared_connections.insert(&it->second[i]);
+            for(auto it2 = it->second[i].connections.begin(); it2 != it->second[i].connections.end(); ++it2){
+                std::set<Node*> temp_shared_connections;
+                int count_connections = 0;
+                for(auto it3 = (*it2)->connections.begin(); it3!= (*it2)->connections.end(); ++it3){
+                    if(shared_connections.find(*it3) != shared_connections.end()){
+                        temp_shared_connections.insert(*it3);
+                        ++count_connections;
                     }
                 }
-                if(at_least_one_within_range){
-                    continue;
+                if(count_connections >= 4){
+                    temp_shared_connections.insert(*it2);
+                    shared_connections = temp_shared_connections;
                 }
-                within_range = false;
-                break;
             }
-            if(abs(it->second[0] - potential_motif.position) > 10*label_length){
-                within_range = false;
-                break;
-            }
-        }
-        if(within_range){
-            cout << potential_motif.sequence << endl;
-            for(auto it = graph[potential_motif.sequence].begin(); it != graph[potential_motif.sequence].end(); ++it){
-                cout << it->first << ":\t";
-                if(it->second.size() > 1){
-                    int lowest = abs(it->second[0] - potential_motif.position), position_id = 0;
-                    for(int i = 1; i < it->second.size(); ++i){
-                        if(abs(it->second[i] - potential_motif.position) < lowest){
-                            lowest = abs(it->second[i] - potential_motif.position), position_id = i;
-                        }
-                    }
-                    cout << it->second[position_id] << endl;
-                    continue;
-                }
-                cout << it->second[0] << endl;
-            }
-            cout << endl;
         }
     }
-    cout << "could not find more motifs with given parameters" << endl;
 }
